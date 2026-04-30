@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model employees {
+  id                               String        @id @db.Uuid
+  name                             String        @db.VarChar(100)
+  role                             employee_role
+  city                             String        @db.VarChar(100)
+  country                          String        @db.VarChar(100)
+  availability                     Boolean
+  created_at                       DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at                       DateTime      @default(now()) @db.Timestamptz(6)
+  jobs_jobs_editor_idToemployees   jobs[]        @relation("jobs_editor_idToemployees")
+  jobs_jobs_reporter_idToemployees jobs[]        @relation("jobs_reporter_idToemployees")
+
+  @@index([role, availability, city], map: "idx_employee_assignment")
+}
+
+model jobs {
+  id                                    String     @id @db.Uuid
+  case_name                             String     @db.VarChar(128)
+  type                                  job_type
+  status                                job_status
+  city                                  String?    @db.VarChar(100)
+  country                               String?    @db.VarChar(100)
+  reporter_id                           String?    @db.Uuid
+  editor_id                             String?    @db.Uuid
+  created_at                            DateTime   @default(now()) @db.Timestamptz(6)
+  updated_at                            DateTime   @default(now()) @db.Timestamptz(6)
+  employees_jobs_editor_idToemployees   employees? @relation("jobs_editor_idToemployees", fields: [editor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employees_jobs_reporter_idToemployees employees? @relation("jobs_reporter_idToemployees", fields: [reporter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([editor_id], map: "idx_jobs_editor_id")
+  @@index([reporter_id], map: "idx_jobs_reporter_id")
+  @@index([status], map: "idx_jobs_status")
+}
+
+enum employee_role {
+  REPORTER
+  EDITOR
+}
+
+enum job_status {
+  NEW
+  ASSIGNED
+  TRANSCRIBED
+  REVIEWED
+  COMPLETED
+}
+
+enum job_type {
+  PHYSICAL
+  REMOTE
+}
