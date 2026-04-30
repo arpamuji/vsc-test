@@ -1,0 +1,19 @@
+{
+  "name": "vsc-test",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "start": "bun run index.ts"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "prettier": "^3.8.3",
+    "@types/bun": "latest"
+  }
+}
