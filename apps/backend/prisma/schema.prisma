@@ -16,8 +16,8 @@ model employees {
   availability                     Boolean
   createdAt                        DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt                        DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  jobs_jobs_editor_idToemployees   jobs[]        @relation("jobs_editor_idToemployees")
-  jobs_jobs_reporter_idToemployees jobs[]        @relation("jobs_reporter_idToemployees")
+  assignedJobs                        jobs[]       @relation("JobReporter")
+  editedJobs                          jobs[]       @relation("JobEditor")
 
   @@index([role, availability, city], map: "idx_employee_assignment")
 }
@@ -36,8 +36,8 @@ model jobs {
   editorFee                             Int?       @map("editor_fee")
   createdAt                             DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt                             DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  employees_jobs_editor_idToemployees   employees? @relation("jobs_editor_idToemployees", fields: [editorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  employees_jobs_reporter_idToemployees employees? @relation("jobs_reporter_idToemployees", fields: [reporterId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reporter                            employees? @relation("JobReporter", fields: [reporterId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  editor                              employees? @relation("JobEditor", fields: [editorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([editorId], map: "idx_jobs_editor_id")
   @@index([reporterId], map: "idx_jobs_reporter_id")
