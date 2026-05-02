@@ -13,7 +13,10 @@ const createJobSchema = {
   body: z
     .object({
       caseName: z.string().min(1).max(500),
-      type: z.enum(JOB_TYPES),
+      type: z
+        .string()
+        .transform((value) => value.toUpperCase())
+        .pipe(z.enum(JOB_TYPES)),
       duration: z.number().int().positive(),
       city: z.string().min(1).max(100),
       country: z.string().min(1).max(100),
@@ -25,7 +28,11 @@ const updateJobSchema = {
   body: z
     .object({
       caseName: z.string().min(1).max(500),
-      type: z.enum(JOB_TYPES),
+      type: z
+        .string()
+        .transform((value) => value.toUpperCase())
+        .pipe(z.enum(JOB_TYPES))
+        .optional(),
       duration: z.number().int().positive(),
       city: z.string().min(1).max(100),
       country: z.string().min(1).max(100),

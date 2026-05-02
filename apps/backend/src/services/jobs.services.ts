@@ -6,17 +6,40 @@ import { CreateJobSchema, UpdateJobSchema } from '../schemas/jobs.schemas';
 
 const getJobs = async () => {
   const jobs = await prisma.jobs.findMany({
+    include: {
+      reporter: {
+        select: { id: true, name: true, city: true, country: true },
+      },
+      editor: {
+        select: { id: true, name: true, city: true, country: true },
+      },
+    },
     orderBy: { createdAt: 'desc' },
   });
 
-  return jobs;
+  return jobs.map((job) => {
+    return {
+      ...job,
+      reporterFee: job.reporterFee ?? 0,
+      editorFee: job.editorFee ?? 0,
+      totalPayout: (job.reporterFee ?? 0) + (job.editorFee ?? 0),
+    };
+  });
 };
 const getJobById = async (id: string) => {
-  const job = await prisma.jobs.findUnique({ where: { id } });
+  const job = await prisma.jobs.findUnique({
+    include: {
+      reporter: {
+        select: { id: true, name: true, city: true, country: true },
+      },
+      editor: {
+        select: { id: true, name: true, city: true, country: true },
+      },
+    },
+    where: { id },
+  });
 
   if (!job) {
-    // Logger can be added here to log the error details
-
     throw new AppError({
       statusCode: StatusCodes.NOT_FOUND,
       code: 'JOB_NOT_FOUND',
@@ -24,7 +47,12 @@ const getJobById = async (id: string) => {
     });
   }
 
-  return job;
+  return {
+    ...job,
+    reporterFee: job.reporterFee ?? 0,
+    editorFee: job.editorFee ?? 0,
+    totalPayout: (job.reporterFee ?? 0) + (job.editorFee ?? 0),
+  };
 };
 const createJob = async (data: CreateJobSchema) => {
   const job = await prisma.jobs.create({
@@ -40,8 +68,6 @@ const updateJob = async (id: string, data: UpdateJobSchema) => {
   const existingJob = await prisma.jobs.findUnique({ where: { id } });
 
   if (!existingJob) {
-    // Logger can be added here to log the error details
-
     throw new AppError({
       statusCode: StatusCodes.NOT_FOUND,
       code: 'JOB_NOT_FOUND',
@@ -78,8 +104,6 @@ const assignReporter = async (id: string, reporterId: string) => {
   const reporter = await prisma.employees.findUnique({ where: { id: reporterId } });
 
   if (!reporter) {
-    // Logger can be added here to log the error details
-
     throw new AppError({
       statusCode: StatusCodes.NOT_FOUND,
       code: 'REPORTER_NOT_FOUND',
@@ -88,8 +112,6 @@ const assignReporter = async (id: string, reporterId: string) => {
   }
 
   if (reporter.role !== 'REPORTER') {
-    // Logger can be added here to log the error details
-
     throw new AppError({
       statusCode: StatusCodes.BAD_REQUEST,
       code: 'INVALID_REPORTER_ROLE',
@@ -101,12 +123,18 @@ const assignReporter = async (id: string, reporterId: string) => {
     existingJob.type === 'PHYSICAL' &&
     existingJob.city?.toLowerCase() !== reporter.city.toLowerCase()
   ) {
-    // Logger can be added here to log the error details
-
     throw new AppError({
       statusCode: StatusCodes.BAD_REQUEST,
       code: 'CITY_MISMATCH',
       message: `Reporter with ID ${reporterId} must be in the same city as the job for PHYSICAL type`,
+    });
+  }
+
+  if (!reporter.availability) {
+    throw new AppError({
+      statusCode: StatusCodes.BAD_REQUEST,
+      code: 'REPORTER_UNAVAILABLE',
+      message: `Reporter with ID ${reporterId} is currently unavailable`,
     });
   }
 
@@ -159,6 +187,14 @@ const assignEditor = async (id: string, editorId: string) => {
       statusCode: StatusCodes.BAD_REQUEST,
       code: 'INVALID_EDITOR_ROLE',
       message: `Employee with ID ${editorId} does not have EDITOR role`,
+    });
+  }
+
+  if (!editor.availability) {
+    throw new AppError({
+      statusCode: StatusCodes.BAD_REQUEST,
+      code: 'EDITOR_UNAVAILABLE',
+      message: `Editor with ID ${editorId} is currently unavailable`,
     });
   }
 
@@ -227,7 +263,10 @@ const completeJob = async (id: string) => {
     },
   });
 
-  return updatedJob;
+  return {
+    ...updatedJob,
+    totalPayout: reporterPayment + editorPayment,
+  };
 };
 
 export default {
