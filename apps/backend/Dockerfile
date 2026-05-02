@@ -3,7 +3,7 @@
 # ============================================
 # Stage 1: Dependencies (layer cache)
 # ============================================
-FROM oven/bun:1-slim AS deps
+FROM docker.io/oven/bun:1-slim AS deps
 
 WORKDIR /app
 
@@ -21,7 +21,7 @@ COPY prisma ./prisma
 COPY prisma.config.ts ./
 COPY src ./src
 
-RUN bun run prisma:generate
+RUN DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy bun run prisma:generate
 
 EXPOSE 3001
 
@@ -38,13 +38,13 @@ COPY prisma ./prisma
 COPY prisma.config.ts ./
 COPY src ./src
 
-RUN bun run prisma:generate
+RUN DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy bun run prisma:generate
 RUN bun run build
 
 # ============================================
 # Stage 4: Production (slim runtime)
 # ============================================
-FROM oven/bun:1-slim AS production
+FROM docker.io/oven/bun:1-slim AS production
 
 WORKDIR /app
 
@@ -54,7 +54,7 @@ COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/prisma.config.ts ./
 COPY package.json ./
 
-RUN bun run prisma:generate
+RUN DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy bun run prisma:generate
 
 EXPOSE 3001
 
