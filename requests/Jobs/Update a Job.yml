@@ -1,0 +1,29 @@
+info:
+  name: Update a Job
+  type: http
+  seq: 4
+
+http:
+  method: PUT
+  url: '{{BASE_URL}}/jobs/:id'
+  params:
+    - name: id
+      value: e7479784-f08a-492f-ac99-411ee64a1834
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "caseName": "Coup dé Etat Trials",
+        "type": "PHYSICAL",
+        "duration": 120,
+        "city": "Tokyo",
+        "country": "Japan"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

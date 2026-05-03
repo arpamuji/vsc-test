@@ -1,0 +1,25 @@
+info:
+  name: Assign Editor to Job
+  type: http
+  seq: 5
+
+http:
+  method: PATCH
+  url: '{{BASE_URL}}/jobs/:id/editor'
+  params:
+    - name: id
+      value: e7479784-f08a-492f-ac99-411ee64a1834
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "editorId": "2b4c6fbe-ee6a-4e13-8857-2fab5597546e"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

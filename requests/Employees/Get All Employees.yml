@@ -1,0 +1,31 @@
+info:
+  name: Get All Employees
+  type: http
+  seq: 9
+
+http:
+  method: GET
+  url: '{{BASE_URL}}/employees/?role=editor'
+  params:
+    - name: availability
+      value: 'true'
+      type: query
+      disabled: true
+    - name: city
+      value: ''
+      type: query
+      disabled: true
+    - name: country
+      value: ''
+      type: query
+      disabled: true
+    - name: role
+      value: editor
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
