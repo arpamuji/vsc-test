@@ -42,7 +42,7 @@ services:
       - ./apps/backend/prisma.config.ts:/app/prisma.config.ts
       - ./apps/backend/src:/app/src
     command: >
-      sh -c "bun run prisma:generate && bun run prisma:migrate && bun run dev"
+      sh -c "bun run prisma:generate && bun run prisma:migrate && bun run prisma:seed && bun run dev"
     profiles:
       - dev
 
