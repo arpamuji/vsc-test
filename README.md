@@ -20,7 +20,7 @@ vsc-test/
 
 ## Setup
 
-> **Note:** We recommend using the [Docker setup](#docker-recommended) above for zero-config setup.
+> **Note:** We recommend using the [Docker setup](#docker-recommended) below for zero-config setup.
 > The manual setup below is only needed if you don't have Docker installed.
 
 ### Prerequisites

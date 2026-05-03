@@ -1,0 +1,19 @@
+info:
+  name: Get Jobs By ID
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: '{{BASE_URL}}/jobs/:id'
+  params:
+    - name: id
+      value: e7479784-f08a-492f-ac99-411ee64a1834
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

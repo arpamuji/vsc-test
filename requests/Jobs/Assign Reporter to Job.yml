@@ -1,0 +1,25 @@
+info:
+  name: Assign Reporter to Job
+  type: http
+  seq: 6
+
+http:
+  method: PATCH
+  url: '{{BASE_URL}}/jobs/:id/reporter'
+  params:
+    - name: id
+      value: e7479784-f08a-492f-ac99-411ee64a1834
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "reporterId": "e86c0599-3c68-47bc-9d75-d4d93de5217d"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,25 @@
+info:
+  name: Create a Job
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: '{{BASE_URL}}/jobs'
+  body:
+    type: json
+    data: |-
+      {
+        "caseName": "Coup dé Etat Trials",
+        "type": "REMOTE",
+        "duration": 120,
+        "city": "Tokyo",
+        "country": "Japan"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

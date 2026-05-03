@@ -1,0 +1,19 @@
+info:
+  name: Complete Job
+  type: http
+  seq: 8
+
+http:
+  method: PATCH
+  url: '{{BASE_URL}}/jobs/:id/complete'
+  params:
+    - name: id
+      value: e7479784-f08a-492f-ac99-411ee64a1834
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
