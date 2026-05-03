@@ -56,6 +56,11 @@ COPY package.json ./
 
 RUN DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy bun run prisma:generate
 
+USER bun
+
 EXPOSE 3001
+
+HEALTHCHECK --interval=10s --timeout=3s --start-period=5s \
+  CMD bun -e "await fetch('http://localhost:3001/api/health')"
 
 CMD ["bun", "run", "start:prod"]

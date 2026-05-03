@@ -1,6 +1,6 @@
 .PHONY: help dev prod seed down logs logs-backend logs-frontend shell-backend shell-frontend setup setup-docker
 
-COMPOSE = docker compose
+COMPOSE ?= docker compose
 PROFILES_DEV = --profile dev
 PROFILES_PROD = --profile prod
 
@@ -16,6 +16,12 @@ prod: ## Start production environment
 	$(COMPOSE) $(PROFILES_PROD) up --build -d
 
 seed: ## Seed the database
+	@echo "Waiting for database to be healthy..."
+	@for i in $$(seq 1 30); do \
+		$(COMPOSE) $(PROFILES_DEV) exec -T db pg_isready -U $${POSTGRES_USER:-vsc} > /dev/null 2>&1 && break; \
+		if [ "$$i" -eq 30 ]; then echo "Database not healthy after 30s"; exit 1; fi; \
+		sleep 1; \
+	done
 	$(COMPOSE) $(PROFILES_DEV) run --rm backend sh -c "bun run prisma:seed"
 
 down: ## Stop all containers
@@ -37,10 +43,22 @@ shell-backend: ## Open shell in backend container
 shell-frontend: ## Open shell in frontend container
 	$(COMPOSE) $(PROFILES_DEV) exec frontend sh
 
-setup: ## Check prerequisites (docker, docker compose)
+setup: ## Check prerequisites (podman/docker, podman-compose/docker compose)
 	@echo "Checking prerequisites..."
-	@docker --version || (echo "ERROR: Docker not found. Install Docker first." && exit 1)
-	@docker compose version || (echo "ERROR: Docker Compose not found." && exit 1)
+	@if command -v podman > /dev/null 2>&1; then \
+		podman --version; \
+	elif command -v docker > /dev/null 2>&1; then \
+		docker --version; \
+	else \
+		echo "ERROR: Docker or Podman not found. Install one first."; exit 1; \
+	fi
+	@if command -v docker > /dev/null 2>&1 && docker compose version > /dev/null 2>&1; then \
+		docker compose version; \
+	elif command -v podman-compose > /dev/null 2>&1; then \
+		podman-compose --version; \
+	else \
+		echo "ERROR: Docker Compose or podman-compose not found."; exit 1; \
+	fi
 	@echo "All prerequisites met."
 
 setup-docker: ## Full setup: verify docker, pull images, start dev
