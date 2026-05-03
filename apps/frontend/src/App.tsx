@@ -1,8 +1,20 @@
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Layout from './components/layout/Layout';
+import DashboardPage from './pages/DashboardPage';
+import EmployeesPage from './pages/EmployeesPage';
+import JobsPage from './pages/JobsPage';
+
 function App() {
   return (
-    <>
-      <h1>Hello, Vite + React!</h1>
-    </>
+    <BrowserRouter>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/jobs" element={<JobsPage />} />
+          <Route path="/employees" element={<EmployeesPage />} />
+        </Routes>
+      </Layout>
+    </BrowserRouter>
   );
 }
 

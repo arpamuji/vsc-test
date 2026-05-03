@@ -1,0 +1,109 @@
+services:
+  # ─── Database ──────────────────────────────────────────────
+  db:
+    image: docker.io/library/postgres:16-alpine
+    container_name: vsc-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    profiles:
+      - dev
+      - prod
+
+  # ─── Backend ───────────────────────────────────────────────
+  backend:
+    container_name: vsc-backend
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+      target: development
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: ${PORT}
+      FRONTEND_URL: ${FRONTEND_URL}
+      NODE_ENV: ${NODE_ENV}
+    ports:
+      - '${PORT}:${PORT}'
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./apps/backend/prisma:/app/prisma
+      - ./apps/backend/prisma.config.ts:/app/prisma.config.ts
+      - ./apps/backend/src:/app/src
+    command: >
+      sh -c "bun run prisma:generate && bun run prisma:migrate && bun run prisma:seed && bun run dev"
+    profiles:
+      - dev
+
+  # ─── Frontend ──────────────────────────────────────────────
+  frontend:
+    container_name: vsc-frontend
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+      target: development
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: ${VITE_API_URL}
+    ports:
+      - '5173:5173'
+    depends_on:
+      - backend
+    volumes:
+      - ./apps/frontend/src:/app/src
+    profiles:
+      - dev
+
+  # ─── Backend (Production) ──────────────────────────────────
+  backend-prod:
+    container_name: vsc-backend-prod
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+      target: production
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: ${PORT}
+      FRONTEND_URL: http://localhost
+      NODE_ENV: production
+    ports:
+      - '${PORT}:${PORT}'
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - prod
+    command: >
+      sh -c "bun run prisma:migrate && bun run start:prod"
+
+  # ─── Frontend (Production) ─────────────────────────────────
+  frontend-prod:
+    container_name: vsc-frontend-prod
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+      target: production
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    depends_on:
+      - backend-prod
+    profiles:
+      - prod
+
+volumes:
+  postgres_data:

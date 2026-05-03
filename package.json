@@ -1,7 +1,16 @@
 {
   "name": "vsc-test",
   "module": "index.ts",
-  "type": "module",
+  "devDependencies": {
+    "@commitlint/cli": "^20.5.3",
+    "@commitlint/config-conventional": "^20.5.3",
+    "@types/bun": "latest",
+    "husky": "^9.1.7",
+    "prettier": "^3.8.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
   "private": true,
   "scripts": {
     "format": "prettier . --write",
@@ -9,15 +18,8 @@
     "start": "bun run index.ts",
     "prepare": "husky"
   },
-  "peerDependencies": {
-    "typescript": "^5"
-  },
-  "dependencies": {},
-  "devDependencies": {
-    "@commitlint/cli": "^20.5.3",
-    "@commitlint/config-conventional": "^20.5.3",
-    "@types/bun": "latest",
-    "husky": "^9.1.7",
-    "prettier": "^3.8.3"
+  "type": "module",
+  "dependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.1"
   }
 }

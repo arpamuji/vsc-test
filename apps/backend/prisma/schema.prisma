@@ -8,36 +8,39 @@ datasource db {
 }
 
 model employees {
-  id                               String        @id @db.Uuid
+  id                               String        @id @default(uuid()) @db.Uuid
   name                             String        @db.VarChar(100)
   role                             employee_role
   city                             String        @db.VarChar(100)
   country                          String        @db.VarChar(100)
   availability                     Boolean
-  created_at                       DateTime      @default(now()) @db.Timestamptz(6)
-  updated_at                       DateTime      @default(now()) @db.Timestamptz(6)
-  jobs_jobs_editor_idToemployees   jobs[]        @relation("jobs_editor_idToemployees")
-  jobs_jobs_reporter_idToemployees jobs[]        @relation("jobs_reporter_idToemployees")
+  createdAt                        DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                        DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  assignedJobs                        jobs[]       @relation("JobReporter")
+  editedJobs                          jobs[]       @relation("JobEditor")
 
   @@index([role, availability, city], map: "idx_employee_assignment")
 }
 
 model jobs {
-  id                                    String     @id @db.Uuid
-  case_name                             String     @db.VarChar(128)
+  id                                    String     @id @default(uuid()) @db.Uuid
+  caseName                              String     @map("case_name") @db.VarChar(500)
   type                                  job_type
+  duration                              Int
   status                                job_status
   city                                  String?    @db.VarChar(100)
   country                               String?    @db.VarChar(100)
-  reporter_id                           String?    @db.Uuid
-  editor_id                             String?    @db.Uuid
-  created_at                            DateTime   @default(now()) @db.Timestamptz(6)
-  updated_at                            DateTime   @default(now()) @db.Timestamptz(6)
-  employees_jobs_editor_idToemployees   employees? @relation("jobs_editor_idToemployees", fields: [editor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  employees_jobs_reporter_idToemployees employees? @relation("jobs_reporter_idToemployees", fields: [reporter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reporterId                            String?    @map("reporter_id") @db.Uuid
+  reporterFee                           Int?       @map("reporter_fee")
+  editorId                              String?    @map("editor_id") @db.Uuid
+  editorFee                             Int?       @map("editor_fee")
+  createdAt                             DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                             DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  reporter                            employees? @relation("JobReporter", fields: [reporterId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  editor                              employees? @relation("JobEditor", fields: [editorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@index([editor_id], map: "idx_jobs_editor_id")
-  @@index([reporter_id], map: "idx_jobs_reporter_id")
+  @@index([editorId], map: "idx_jobs_editor_id")
+  @@index([reporterId], map: "idx_jobs_reporter_id")
   @@index([status], map: "idx_jobs_status")
 }
 

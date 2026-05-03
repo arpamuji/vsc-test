@@ -1,0 +1,22 @@
+# <type>(<scope>): <subject>
+# |<----  Use a maximum of 50 characters for the subject line  ---->|
+
+# Body (motivation, context, details)
+# |<----  Try to keep each line a maximum of 72 characters  ---->|
+
+# Footer (Closes #123, BREAKING CHANGE, etc.)
+
+# --- COMMIT TEMPLATE ---
+# Types: init, feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+# Scopes: frontend, backend, shared, deps, config, project, docs
+#
+# Rules:
+# - Scope is REQUIRED (never empty)
+#
+# Examples:
+#   init(project): project root initialization
+#   feat(backend): add reporter assignment endpoint
+#   fix(frontend): correct button alignment on dashboard
+#   chore(deps): update prisma to v7
+#
+# --- END OF COMMIT MESSAGE ---
